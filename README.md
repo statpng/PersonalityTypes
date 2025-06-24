@@ -1,3 +1,3 @@
 # PersonalityTypes
 
-Gaussian mixture modelling for analysis of five-factor model based data of personality types
+A Gaussian Mixture Model Approach to Analyzing Personality Types in Five-Factor Model Data
