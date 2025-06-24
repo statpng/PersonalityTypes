@@ -1,0 +1,26 @@
+Package: png.GMM
+Type: Package
+Title: Guassian Mixture Models for Psychological Outcomes
+Version: 0.1
+Authors@R: 
+  person("Kipoong", "Kim", email = "kkp7700@gmail.com", role = c("aut", "cre"))
+Description: Useful functions
+License: MIT + file LICENSE
+URL: https://statpng.com
+BugReports: https://github.com/statpng/png.mesh/issues
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Suggests: 
+Imports:
+    data.table,
+    dplyr,
+    magrittr,
+    tibble,
+    tidyr,
+    stringr,
+    ggplot2,
+    gtools
+Depends: 
+    R (>= 4.0)
