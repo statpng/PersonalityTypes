@@ -5,17 +5,7 @@ Version: 0.1
 Description: A Gaussian Mixture Model Approach to Analyzing Personality Types in Five-Factor Model Data
 Suggests: 
 Imports:
-    data.table,
-    magrittr,
-    tibble,
-    tidyr,
-    stringr,
-    ggplot2,
-    gtools,
-    mclust,
-    dplyr,
-    tidyr,
-    ggpubr
+    dplyr, tidyr, ggplot2, ggpubr, gtools, mclust
 Depends: 
     R (>= 4.0)
 NeedsCompilation: yes
