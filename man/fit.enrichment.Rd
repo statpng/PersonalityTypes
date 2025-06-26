@@ -33,14 +33,14 @@ This function provides a statistical assessment of how "real" each cluster is. A
 
 The statistical procedure is as follows:
 \enumerate{
-\item \strong{Observed Density}: For the original fitted model (\code{mod}), it calculates the probability density ($\rho_{obs}$) at the location of each cluster's centroid using the estimated GMM parameters.
+\item \strong{Observed Density}: For the original fitted model (\code{mod}), it calculates the probability density (\eqn{\rho_{obs}}) at the location of each cluster's centroid using the estimated GMM parameters.
 \item \strong{Permutation (Null Distribution)}: It generates a null distribution for the density. This is done by:
 a.  Creating \code{nrep} permuted datasets. In each, the values within the data matrix are randomly shuffled, breaking any real structure.
 b.  For each permuted dataset, a new GMM is fitted with the same specifications (number of clusters, model name).
-c.  The density ($\rho_{perm}$) is calculated at the locations of the \emph{original} centroids using the parameters from the model fitted to the \emph{permuted} data.
+c.  The density (\eqn{\rho_{perm}}) is calculated at the locations of the \emph{original} centroids using the parameters from the model fitted to the \emph{permuted} data.
 \item \strong{Enrichment and p-value}:
 \itemize{
-\item The relative enrichment ($\rho_{rel}$) for each cluster is the ratio of the observed density to the mean of the densities from the null distribution: $\rho_{rel} = \rho_{obs} / \text{mean}(\rho_{perm})$. A value > 1 suggests the cluster is in a denser-than-random region.
+\item The relative enrichment (\eqn{\rho_{rel}}) for each cluster is the ratio of the observed density to the mean of the densities from the null distribution: \eqn{\rho_{rel} = \rho_{obs} / \text{mean}(\rho_{perm})}. A value > 1 suggests the cluster is in a denser-than-random region.
 \item An empirical p-value is calculated for each cluster as the proportion of permutations where the permuted density was greater than or equal to the observed density. This represents the probability of observing such a high density by chance alone. A low p-value suggests the cluster is statistically significant.
 }
 }

@@ -82,13 +82,13 @@ reassign.enrichment <- function(Xnew, class, mod, wh.class){
 #' This function provides a statistical assessment of how "real" each cluster is. A robust cluster is expected to form in a region of high data density. This function tests whether the density at each observed cluster centroid is significantly higher than what would be expected by chance.
 #'
 #' The statistical procedure is as follows:
-#' 1.  **Observed Density**: For the original fitted model (`mod`), it calculates the probability density ($\rho_{obs}$) at the location of each cluster's centroid using the estimated GMM parameters.
+#' 1.  **Observed Density**: For the original fitted model (`mod`), it calculates the probability density (\eqn{\rho_{obs}}) at the location of each cluster's centroid using the estimated GMM parameters.
 #' 2.  **Permutation (Null Distribution)**: It generates a null distribution for the density. This is done by:
 #'     a.  Creating `nrep` permuted datasets. In each, the values within the data matrix are randomly shuffled, breaking any real structure.
 #'     b.  For each permuted dataset, a new GMM is fitted with the same specifications (number of clusters, model name).
-#'     c.  The density ($\rho_{perm}$) is calculated at the locations of the *original* centroids using the parameters from the model fitted to the *permuted* data.
+#'     c.  The density (\eqn{\rho_{perm}}) is calculated at the locations of the *original* centroids using the parameters from the model fitted to the *permuted* data.
 #' 3.  **Enrichment and p-value**:
-#'     -   The relative enrichment ($\rho_{rel}$) for each cluster is the ratio of the observed density to the mean of the densities from the null distribution: $\rho_{rel} = \rho_{obs} / \text{mean}(\rho_{perm})$. A value > 1 suggests the cluster is in a denser-than-random region.
+#'     -   The relative enrichment (\eqn{\rho_{rel}}) for each cluster is the ratio of the observed density to the mean of the densities from the null distribution: \eqn{\rho_{rel} = \rho_{obs} / \text{mean}(\rho_{perm})}. A value > 1 suggests the cluster is in a denser-than-random region.
 #'     -   An empirical p-value is calculated for each cluster as the proportion of permutations where the permuted density was greater than or equal to the observed density. This represents the probability of observing such a high density by chance alone. A low p-value suggests the cluster is statistically significant.
 #'
 #' @param mod The fitted model object from `mclust::Mclust`.
@@ -163,7 +163,7 @@ fit.enrichment <- function(mod, BIC=NULL, n.clust=NULL, nrep=100, seed){
 #' This function orchestrates the cluster validation workflow. It takes a fitted GMM
 #' result and performs the following steps:
 #' 1.  Calls `fit.enrichment` to conduct the permutation-based statistical test for cluster robustness.
-#' 2.  Generates a diagnostic "volcano-like" plot, plotting the log-10 p-value against the relative enrichment score ($\rho_{rel}$). This plot visually separates significant clusters (typically in the upper right, with high enrichment and low p-value) from non-significant ones.
+#' 2.  Generates a diagnostic "volcano-like" plot, plotting the log-10 p-value against the relative enrichment score (\eqn{\rho_{rel}}). This plot visually separates significant clusters (typically in the upper right, with high enrichment and low p-value) from non-significant ones.
 #' 3.  Identifies significant clusters (`SigCluster`) based on a significance threshold (e.g., p-value < 0.05).
 #' 4.  Returns a list containing the enrichment results and other relevant model objects for downstream use.
 #'

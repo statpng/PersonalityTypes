@@ -45,7 +45,7 @@ This function orchestrates the cluster validation workflow. It takes a fitted GM
 result and performs the following steps:
 \enumerate{
 \item Calls \code{fit.enrichment} to conduct the permutation-based statistical test for cluster robustness.
-\item Generates a diagnostic "volcano-like" plot, plotting the log-10 p-value against the relative enrichment score ($\rho_{rel}$). This plot visually separates significant clusters (typically in the upper right, with high enrichment and low p-value) from non-significant ones.
+\item Generates a diagnostic "volcano-like" plot, plotting the log-10 p-value against the relative enrichment score (\eqn{\rho_{rel}}). This plot visually separates significant clusters (typically in the upper right, with high enrichment and low p-value) from non-significant ones.
 \item Identifies significant clusters (\code{SigCluster}) based on a significance threshold (e.g., p-value < 0.05).
 \item Returns a list containing the enrichment results and other relevant model objects for downstream use.
 }
