@@ -9,8 +9,8 @@ analysis.GMM.best(
   ID = NULL,
   max.clust = 10,
   filename = NULL,
-  subsample.size = 100,
   print.pdf = TRUE,
+  q = 1,
   type = "NEC"
 )
 }
@@ -22,8 +22,6 @@ analysis.GMM.best(
 \item{max.clust}{The maximum number of clusters to test. Default is 10.}
 
 \item{filename}{A base string for output PDF file names. If \code{NULL}, plots are not saved.}
-
-\item{subsample.size}{The number of random seeds to try. Default is 100.}
 
 \item{type}{The criterion for model selection (currently hardcoded to "NEC").}
 }
@@ -41,7 +39,7 @@ Performs GMM clustering for a range of cluster numbers and random seeds,
 selecting the best model based on the Normalized Entropy Criterion (NEC).
 }
 \details{
-This function systematically explores the solution space of Gaussian Mixture Models to find the optimal number of clusters. It iterates through a specified number of clusters (\code{1:max.clust}) and a set of random initializations (\code{seed.set}).
+This function systematically explores the solution space of Gaussian Mixture Models to find the optimal number of clusters. It iterates through a specified number of clusters (\code{1:max.clust}).
 
 For each combination of cluster number and seed, it fits a GMM (\code{mclust::Mclust} with \code{modelNames="VVV"}) and calculates the NEC using \code{calculate_nec}. The \code{q} value for Tsallis entropy within NEC is hardcoded to 1.5 in this implementation.
 

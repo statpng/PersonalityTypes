@@ -121,13 +121,9 @@ fit.enrichment <- function(mod, BIC=NULL, n.clust=NULL, nrep=100, seed){
     set.seed(iii)
     Xperm <- data %>% {matrix(sample(.), nrow(.), ncol(.))}
     if(!is.null(BIC)){
-      set.seed(62)
-      set.seed(97)
       set.seed(seed)
       mod.perm2 <- Mclust(Xperm, x = BIC, modelNames=modelName, verbose=FALSE)
     } else {
-      set.seed(62)
-      set.seed(97)
       set.seed(seed)
       mod.perm2 <- Mclust(Xperm, G = n.clust, modelNames=modelName, verbose=FALSE)
     }

@@ -68,7 +68,7 @@ tsallis_entropy <- function(p, q) {
 #' @importFrom stats runif
 #'
 #' @details
-#' This function systematically explores the solution space of Gaussian Mixture Models to find the optimal number of clusters. It iterates through a specified number of clusters (`1:max.clust`) and a set of random initializations (`seed.set`).
+#' This function systematically explores the solution space of Gaussian Mixture Models to find the optimal number of clusters. It iterates through a specified number of clusters (`1:max.clust`).
 #'
 #' For each combination of cluster number and seed, it fits a GMM (`mclust::Mclust` with `modelNames="VVV"`) and calculates the NEC using `calculate_nec`. The `q` value for Tsallis entropy within NEC is hardcoded to 1.5 in this implementation.
 #'
@@ -83,7 +83,6 @@ tsallis_entropy <- function(p, q) {
 #' @param ID An optional identifier for the analysis run.
 #' @param max.clust The maximum number of clusters to test. Default is 10.
 #' @param filename A base string for output PDF file names. If `NULL`, plots are not saved.
-#' @param subsample.size The number of random seeds to try. Default is 100.
 #' @param type The criterion for model selection (currently hardcoded to "NEC").
 #' @return A list containing:
 #' \item{ID}{The analysis identifier.}
@@ -95,46 +94,26 @@ tsallis_entropy <- function(p, q) {
 #'
 #' @export analysis.GMM.best
 analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10, 
-                              filename=NULL, subsample.size=100, print.pdf=TRUE, 
-                              type="NEC"){
-
+                              filename=NULL, print.pdf=TRUE, 
+                              q=1.0, type="NEC"){
+  
   library(mclust) # for GMM
   
-  # set.seed(1019447)
-  set.seed(3534388)
-  seed.set <- sample(1:200, size=subsample.size)
-  seed.set <- sort(seed.set)
   
   NEC.mat <- matrix(NA, 200, max.clust)
   
   count <- 0
   base_loglik <- Mclust(Xnew, G=1, modelNames="VVV")$loglik
-  for(j in seed.set){
+  for(j in 1:200){
     count <- count + 1
     print(count)
     fit.mclust <- NULL
-    for(i in 1:max.clust){
+    for(i in 1:200){
       set.seed(j)
       fit.mclust[[i]] <- Mclust(Xnew, G=i, modelNames="VVV")
       
-      wh.best <- t(NEC.mat) %>% {which(.==sort(.)[1], arr.ind=TRUE)}
-      
-      # set.seed(44)
-      # fit.mclust01 <- Mclust(Xnew, G=4, modelNames="VVV")
-      # set.seed(168)
-      # fit.mclust02 <- Mclust(Xnew, G=4, modelNames="VVV")
-      # set.seed(168)
-      # fit.mclust03 <- Mclust(Xnew, G=3, modelNames="VVV")
-      # set.seed(169)
-      # fit.mclust04 <- Mclust(Xnew, G=5, modelNames="VVV")
-      # nec.vec01 <- calculate_nec(model=fit.mclust01, base_loglik=base_loglik, q=1.5)
-      # nec.vec02 <- calculate_nec(model=fit.mclust02, base_loglik=base_loglik, q=1.5)
-      # nec.vec03 <- calculate_nec(model=fit.mclust03, base_loglik=base_loglik, q=1.5)
-      # nec.vec04 <- calculate_nec(model=fit.mclust04, base_loglik=base_loglik, q=1.5)
-      # min(NEC.mat,na.rm=T)
-      
       if(i > 1){
-        nec.vec <- calculate_nec(model=fit.mclust[[i]], base_loglik=base_loglik, q=1.5)
+        nec.vec <- calculate_nec(model=fit.mclust[[i]], base_loglik=base_loglik, q=q)
         nec.vec
         NEC.mat[j,i] <- nec.vec
       }
@@ -142,21 +121,9 @@ analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10,
     }
   }
   
-  
-  
-  # NEC.mat[c(44,168),4] <- NA
-  # NEC.mat[c(168),3] <- NA
-  
-  NEC.mat[,5] %>% sort %>% head
-  NEC.mat[,5] %>% order %>% head
-  NEC.mat[,4] %>% sort %>% head
-  NEC.mat[,4] %>% order %>% head
-  
   wh.best <- t(NEC.mat) %>% {which(.==sort(.)[1], arr.ind=TRUE)}
   
-  apply(NEC.mat, 2,function(x) mean(x,na.rm=TRUE))
-  
-  NEC.mat[,4] %>% sort %>% head
+  # apply(NEC.mat, 2,function(x) mean(x,na.rm=TRUE))
   
   # pdf(filename%++%"-GMM-NEC-TotalSeeds-MeanCurve.pdf", height=4, width=8)
   # t(NEC.mat) %>% { matplot( cbind(rowMeans(.), .), type="l", lty=c(1,rep(2,ncol(.))), col=c("red", rep("gray50", ncol(.))), ylab="Normalized Entropy Criterion", xlab="The number of clusters") }
@@ -164,10 +131,10 @@ analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10,
   # extrafont::embed_fonts(filename%++%"-GMM-NEC-TotalSeeds-MeanCurve.pdf")
   
   pdf(filename%++%"GMM-NEC-TotalSeeds.pdf", height=4, width=8)
-    t(NEC.mat) %>% { matplot(., type="l", lty=rep(2,ncol(.)), col=c(rep("gray50", ncol(.))), ylab="Normalized Entropy Criterion", xlab="The number of clusters") }
-    wh.best <- t(NEC.mat) %>% { which(.==sort(.)[1], arr.ind=TRUE) }
-    t(NEC.mat) %>% { points(wh.best[1], .[wh.best[1],wh.best[2]], col="red", pch=18) }
-    abline(v=wh.best[1], col="red", lty=2)
+  t(NEC.mat) %>% { matplot(., type="l", lty=rep(2,ncol(.)), col=c(rep("gray50", ncol(.))), ylab="Normalized Entropy Criterion", xlab="The number of clusters") }
+  wh.best <- t(NEC.mat) %>% { which(.==sort(.)[1], arr.ind=TRUE) }
+  t(NEC.mat) %>% { points(wh.best[1], .[wh.best[1],wh.best[2]], col="red", pch=18) }
+  abline(v=wh.best[1], col="red", lty=2)
   dev.off()
   extrafont::embed_fonts(filename%++%"GMM-NEC-TotalSeeds.pdf")
   
@@ -238,12 +205,7 @@ analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10,
 analysis.NVI <- function(Xnew, nclust, NEC.mat, top=20, filename=NULL){
   library(aricode)
   
-  set.seed(3534388)
-  seed.set <- sample(1:200, size=100)
-  seed.set <- sort(seed.set)
-  
-  # rank.NEC <- order(NEC.mat[,nclust])[1:top]
-  rank.NEC <- order(NEC.mat[,nclust]) %>% {.[. %in% seed.set]} %>% .[1:top]
+  rank.NEC <- order(NEC.mat[,nclust])[1:top]
   
   fit.best.list <- NULL
   count=0
@@ -271,7 +233,7 @@ analysis.NVI <- function(Xnew, nclust, NEC.mat, top=20, filename=NULL){
     best_run_NVI <- order(mean_NVI, decreasing=FALSE)
     cat("The most stable clustering result is occured at seed", rank.NEC[best_run_NVI[1]], "\n")
     
-    pdf(filename%++%"NVI_lineplot.pdf", height=4, width=8)
+    pdf(filename%++%"NVI_lineplot.pdf", height=4, width=10)
     plot(mean_NVI, type="l", xaxt="n", xlab="Seed number", ylab="Averaged NVI")
     points(which.min(mean_NVI), min(mean_NVI), col="red", pch=18)
     abline(v=which.min(mean_NVI), col="red", lty=2)
@@ -287,8 +249,8 @@ analysis.NVI <- function(Xnew, nclust, NEC.mat, top=20, filename=NULL){
         Xclust.h <- cbind.data.frame(Xnew, class=fit.h$classification %>% as.factor)
         seed = rank.NEC[ best_run_NVI[h] ]
         Xclust.boxplot.filename(Xclust=Xclust.h,
-                          wh.best=c(nclust,seed),
-                          filename=filename%++%"NVI"%++%length(class.list)%++%"-"%++%h)
+                                wh.best=c(nclust,seed),
+                                filename=filename%++%"NVI"%++%length(class.list)%++%"-"%++%h)
       }
     }
   }

@@ -1,10 +1,77 @@
 run.PersonalityTypes <- function(){
   
+  
+  # > sessionInfo()
+  # R version 4.4.1 (2024-06-14)
+  # Platform: aarch64-apple-darwin20
+  # Running under: macOS 15.5
+  # 
+  # Matrix products: default
+  # BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+  # LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+  # 
+  # locale:
+  #   [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+  # 
+  # time zone: Asia/Seoul
+  # tzcode source: internal
+  # 
+  # attached base packages:
+  #   [1] stats     graphics  grDevices utils     datasets  methods  
+  # [7] base     
+  # 
+  # other attached packages:
+  #   [1] ggpubr_0.6.0         ggplot2_3.5.2        tidyr_1.3.1         
+  # [4] mclust_6.1.1         car_3.1-3            carData_3.0-5       
+  # [7] psych_2.5.3          haven_2.5.5          dplyr_1.1.4         
+  # [10] PersonalityTypes_0.1
+  # 
+  # loaded via a namespace (and not attached):
+  #   [1] tidyselect_1.2.1     farver_2.1.2         R.utils_2.13.0      
+  # [4] fastmap_1.2.0        tensorA_0.36.2.1     promises_1.3.3      
+  # [7] digest_0.6.37        mime_0.13            lifecycle_1.0.4     
+  # [10] ellipsis_0.3.2       magrittr_2.0.3       compiler_4.4.1      
+  # [13] forestploter_1.1.3   rlang_1.1.6          tools_4.4.1         
+  # [16] knitr_1.50           ggsignif_0.6.4       labeling_0.4.3      
+  # [19] htmlwidgets_1.6.4    pkgbuild_1.4.8       mnormt_2.1.1        
+  # [22] xml2_1.3.8           RColorBrewer_1.1-3   pkgload_1.4.0       
+  # [25] abind_1.4-8          miniUI_0.1.2         withr_3.0.2         
+  # [28] purrr_1.0.4          R.oo_1.27.1          desc_1.4.3          
+  # [31] grid_4.4.1           roxygen2_7.3.2       urlchecker_1.0.1    
+  # [34] profvis_0.4.0        xtable_1.8-4         aricode_1.0.3       
+  # [37] extrafontdb_1.0      GPArotation_2025.3-1 scales_1.4.0        
+  # [40] gtools_3.9.5         MASS_7.3-65          cli_3.6.5           
+  # [43] ragg_1.4.0           generics_0.1.4       remotes_2.5.0       
+  # [46] rstudioapi_0.17.1    robustbase_0.99-4-1  commonmark_1.9.5    
+  # [49] sessioninfo_1.2.3    bayesm_3.1-6         cachem_1.1.0        
+  # [52] stringr_1.5.1        parallel_4.4.1       vctrs_0.6.5         
+  # [55] devtools_2.4.5       Matrix_1.7-3         hms_1.1.3           
+  # [58] rstatix_0.7.2        Formula_1.2-5        systemfonts_1.2.3   
+  # [61] testthat_3.2.3       glue_1.8.0           DEoptimR_1.1-3-1    
+  # [64] stringi_1.8.7        gtable_0.3.6         later_1.4.2         
+  # [67] extrafont_0.19       tibble_3.3.0         pillar_1.10.2       
+  # [70] compositions_2.0-8   htmltools_0.5.8.1    brio_1.1.5          
+  # [73] R6_2.6.1             textshaping_1.0.1    rprojroot_2.0.4     
+  # [76] evaluate_1.0.3       shiny_1.10.0         lattice_0.22-7      
+  # [79] R.methodsS3_1.8.2    backports_1.5.0      ggsci_3.2.0         
+  # [82] memoise_2.0.1        broom_1.0.8          httpuv_1.6.16       
+  # [85] Rcpp_1.0.14          Rttf2pt1_1.3.12      gridExtra_2.3       
+  # [88] nlme_3.1-168         xfun_0.52            fs_1.6.6            
+  # [91] forcats_1.0.0        usethis_3.1.0        pkgconfig_2.0.3  
+  
+  
+  
+  
+  
+  
   PackageCompilation <- function(){
     devtools::document()
     devtools::load_all()
   }
   
+  
+  
+  # rdata <- R.utils::loadToEnv("./rdata.title2/BIG5_241231_[4]res.NVI.RData")
   
   
   if(FALSE){
@@ -41,7 +108,7 @@ run.PersonalityTypes <- function(){
     rm(df_raw)
     
     # Create a directory to store the results of the analysis.
-    R.utils::mkdirs("./rdata.filename_fulldata/")
+    R.utils::mkdirs("./rdata.filename_fulldata_q=1.5/")
     
     # Define a base path and prefix for all output files to ensure consistent naming.
     filename <- "./rdata.filename_fulldata/BIG5_241231"
@@ -57,7 +124,7 @@ run.PersonalityTypes <- function(){
     # Perform Factor Analysis on the preprocessed data to reduce dimensionality and compute factor scores.
     set.seed(1)
     res.Data <- analysis.DataPreprocessing(df, strsplit("OCEAN","")[[1]])
-    console <- sink()
+    
     res.FA <- analysis.FA(X=res.Data$X, ID=res.Data$ID, nfactors=5, 
                           filename=filename%++%"[2]")
     
@@ -80,10 +147,11 @@ run.PersonalityTypes <- function(){
     Xnew <- res.FA$Xnew
     ID <- res.FA$ID
     
-    # Run GMM analysis to find the optimal number of personality clusters.
+    
     res.GMM.best <- analysis.GMM.best(Xnew=Xnew, ID=ID, 
-                                      max.clust=10, subsample.size=100, 
-                                      filename=filename%++%"[3]")
+                                      max.clust=10, subsample.size=100,
+                                      q=1.0, filename=filename%++%"[3]")
+    # save(res.GMM.best, file="res.GMM.best_q=1.0.RData")
     
     # Extract the Normalized Entropy Criterion (NEC) matrix from the GMM results.
     # Extract the best number of clusters and the corresponding seed based on the minimum NEC.
@@ -124,7 +192,6 @@ run.PersonalityTypes <- function(){
     save(df, Xclust.NVI_cov, res.Data, res.FA, res.GMM.best, res.NVI, 
          file=filename%++%"[4]res.NVI.RData")
     
-    
     #-------------------------------------------------------------------
     # 5. Enrichment Analysis (for the best model)
     #-------------------------------------------------------------------
@@ -150,21 +217,21 @@ run.PersonalityTypes <- function(){
     #-------------------------------------------------------------------
     
     # Define parameters for the sensitivity analysis.
-    n.clust=10
-    nrep=100
-    seed=res.NVI$wh.best.NVI[2]
-    
-    # Run the enrichment analysis for a range of cluster numbers (2 to 10).
-    res.Enrichment.range.NVI <- analysis.Enrichment.range(Xnew=res.FA$Xnew, n.clust=10, nrep=100, seed=seed)
-    
-    # Create a plot to visualize the results of the sensitivity analysis.
-    # This plot shows how the number of statistically meaningful clusters changes as the number of candidate clusters increases.
-    pdf(file=paste0(filename,"[5]Enrichment-NumberOfClustersTrajectory.pdf"), width=8, height=4)
-      plot( sapply(res.Enrichment.range.NVI, function(x) sum( p.adjust(x$pvalues, method="BH") < 0.05 )), type="b", xlab="Number of candidate clusters", ylab="Number of meaningful clusters")
-    dev.off()
-    
-    save(df, res.Data, res.FA, res.GMM.best, res.NVI, res.Enrichment.NVI, res.Enrichment.range.NVI, 
-         file=filename%++%"[5]res.Enrichment.range.NVI.RData")
+    # n.clust=10
+    # nrep=100
+    # seed=res.NVI$wh.best.NVI[2]
+    # 
+    # # Run the enrichment analysis for a range of cluster numbers (2 to 10).
+    # res.Enrichment.range.NVI <- analysis.Enrichment.range(Xnew=res.FA$Xnew, n.clust=10, nrep=100, seed=seed)
+    # 
+    # # Create a plot to visualize the results of the sensitivity analysis.
+    # # This plot shows how the number of statistically meaningful clusters changes as the number of candidate clusters increases.
+    # pdf(file=paste0(filename,"[5]Enrichment-NumberOfClustersTrajectory.pdf"), width=8, height=4)
+    #   plot( sapply(res.Enrichment.range.NVI, function(x) sum( p.adjust(x$pvalues, method="BH") < 0.05 )), type="b", xlab="Number of candidate clusters", ylab="Number of meaningful clusters")
+    # dev.off()
+    # 
+    # save(df, res.Data, res.FA, res.GMM.best, res.NVI, res.Enrichment.NVI, res.Enrichment.range.NVI, 
+    #      file=filename%++%"[5]res.Enrichment.range.NVI.RData")
     
     
     #-------------------------------------------------------------------
@@ -221,6 +288,7 @@ run.PersonalityTypes <- function(){
     # Initialize a list to store results.
     result.CompReg.filter <- NULL
     for(hh in 1:length(var.list)){
+      set.seed(hh)
       var <- var.list[hh]
       var_filter <- var %++% "_after_PERSONALITY"
       
@@ -245,7 +313,7 @@ run.PersonalityTypes <- function(){
     
     # Loop through the results to create and save a forest plot for each DV.
     for( k in 1:length(var.list) ){
-      
+      set.seed(hh)
       df.forest <- CompReg.forest(result.CompReg.filter[[k]][[1]], DV.name=var.list[k], class=1:nclust, width=30)
       
       grDevices::cairo_pdf(filename%++%"[6]ForestPlot-filtered-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
@@ -260,6 +328,7 @@ run.PersonalityTypes <- function(){
     
     result.CompReg.filter <- NULL
     for(hh in 1:length(var.list)){
+      set.seed(hh)
       var <- var.list[hh]
       var_filter <- var %++% "_after_PERSONALITY"
       
@@ -293,6 +362,7 @@ run.PersonalityTypes <- function(){
     
     # Loop through the adjusted results to create and save a forest plot for each DV.
     for( k in 1:length(var.list) ){
+      set.seed(hh)
       df.forest <- CompReg.forest(result.CompReg.filter[[k]][[1]], DV.name=var.list[k], class=1:nclust, width=30)
       
       grDevices::cairo_pdf(filename%++%"[6]ForestPlot-filtered-Adjusted-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
@@ -311,6 +381,7 @@ run.PersonalityTypes <- function(){
     age.list <- c("[10,20)", "[20,30)", "[30,40)", "[40,50)", "[50,60)", "[60,70)")
     
     for(hh in 1:length(age.list)){
+      set.seed(hh)
       # Filter the data for the current age group.
       Xclust.age <- Xclust %>% 
         mutate(agecut = cut( age_min, breaks = 0:8*10, right=FALSE )) %>% 
@@ -326,6 +397,7 @@ run.PersonalityTypes <- function(){
     #-- Stratified by Gender ----
     gender.list <- c("male", "female")
     for(hh in 1:length(gender.list)){
+      set.seed(hh)
       # Filter the data for the current gender.
       Xclust.gender <- Xclust %>% 
         filter(gender_vote==gender.list[hh]) %>% 

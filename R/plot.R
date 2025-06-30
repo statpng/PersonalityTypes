@@ -117,7 +117,7 @@ NVI.BoxPlot <- function(res.NVI, filename=NULL){
   attr(Xclust.NVI, "seed")
 
   Xclust.boxplot.filename_new(Xclust=Xclust.NVI, wh.best=c(wh.best.NVI[1], wh.best.NVI[2]), 
-                              filename=filename%++%"NVI-best")
+                              filename=filename%++%"NVI-best-NewPanel")
 }
 
 
