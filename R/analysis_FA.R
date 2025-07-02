@@ -1,3 +1,9 @@
+# Due to a nondisclosure agreement and joint data ownership between the Center for [blinded] and Kakao Corporation, 
+# we are unable to publicly share the raw scores of individual scale items. 
+# Instead, the dataset includes factor scores derived from our factor analysis of the IPIP-NEO-120 responses, 
+# along with the composite score(s) for each correlate. Although the raw data necessary for conducting a factor analysis are not included, 
+# we have provided the analysis code for transparency. The dataset can be analyzed beginning with the code provided for the GMM analysis.
+
 #' @title Perform First and Second-Order Factor Analysis
 #' @description Conducts a comprehensive factor analysis workflow, including data
 #' suitability tests, determination of the number of factors, fitting a first-order

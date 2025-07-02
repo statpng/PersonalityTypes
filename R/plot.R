@@ -31,7 +31,7 @@ Xclust.boxplot.filename <- function(Xclust, wh.best, filename){
   
   library(ggpubr)
   # Xclust <- cbind.data.frame(Xnew, class=fit.best$classification)
-  Xclust.df <- Xclust %>% slice_sample(prop=1) %>% gather(Factors, value, -class) %>% 
+  Xclust.df <- Xclust %>% gather(Factors, value, -class) %>% 
     mutate(class=as.factor(class),
            Factors=factor(Factors, levels=c("O","C","E","A","N")))
   
@@ -76,7 +76,7 @@ Xclust.boxplot.filename_new <- function(Xclust, wh.best, filename){
   library(ggpubr)
   # Xclust=Xclust.NVI; wh.best=c(wh.best.NVI[1], wh.best.NVI[2]); filename=filename%++%"[4_new]NVI-best-"
   
-  Xclust.df <- Xclust %>% slice_sample(prop=1) %>% gather(Factors, value, -class) %>% 
+  Xclust.df <- Xclust %>% gather(Factors, value, -class) %>% 
     mutate(class=factor(class, levels=c(4,2,3,5,1), labels=c("Average", "Inquisitive Individualist", "Unsettled", "Expressive", "Conventional")),
            Factors=factor(Factors, levels=c("O","C","E","A","N")))
   

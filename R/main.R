@@ -1,5 +1,12 @@
 run.PersonalityTypes <- function(){
   
+  # Due to a nondisclosure agreement and joint data ownership between the Center for [blinded] and Kakao Corporation, 
+  # we are unable to publicly share the raw scores of individual scale items. 
+  # Instead, the dataset includes factor scores derived from our factor analysis of the IPIP-NEO-120 responses, 
+  # along with the composite score(s) for each correlate. Although the raw data necessary for conducting a factor analysis are not included, 
+  # we have provided the analysis code for transparency. The dataset can be analyzed beginning with the code provided for the GMM analysis.
+
+
   
   # > sessionInfo()
   # R version 4.4.1 (2024-06-14)
@@ -64,10 +71,10 @@ run.PersonalityTypes <- function(){
   
   
   
-  PackageCompilation <- function(){
-    devtools::document()
-    devtools::load_all()
-  }
+  # PackageCompilation <- function(){
+  #   devtools::document()
+  #   devtools::load_all()
+  # }
   
   
   
@@ -91,51 +98,97 @@ run.PersonalityTypes <- function(){
     
     # Load necessary packages for data manipulation and file reading.
     library(dplyr)
-    library(haven) # for SPSS .sav file
+    library(ggplot2)
     
     
-    
-    # This section shows how the original SPSS data was read and saved as an RDS file (run once).
-    # PersonalityTypes_241231 <- haven::read_sav("./datasets/241231 BIG5_DVs_FINAL3.sav") %>% as_tibble()
-    # saveRDS(PersonalityTypes_241231, file = "./dataset/PersonalityTypes_241231.rds")
-    
-    
-    # Load the raw dataset from the RDS file.
-    df_raw <- readRDS("./datasets/PersonalityTypes_241231.rds", refhook = NULL)
-    
-    # Use either the full dataset (prop=1) or a small sample (prop=0.001) for quick testing.
-    df <- df_raw %>% slice_sample(prop=c(1,0.001)[1])
-    rm(df_raw)
     
     # Create a directory to store the results of the analysis.
-    R.utils::mkdirs("./rdata.filename_fulldata_q=1.5/")
+    R.utils::mkdirs("./result/")
     
     # Define a base path and prefix for all output files to ensure consistent naming.
-    filename <- "./rdata.filename_fulldata/BIG5_241231"
+    filename <- "./result/BIG5_241231"
     
     
     
-    #-------------------------------------------------------------------
-    # 2. Exploratory Factor Analysis (EFA)
-    #-------------------------------------------------------------------
-    
-    # Set a seed for reproducibility of random processes in the analysis.
-    # Preprocess the raw data to extract relevant items and handle missing values.
-    # Perform Factor Analysis on the preprocessed data to reduce dimensionality and compute factor scores.
-    set.seed(1)
-    res.Data <- analysis.DataPreprocessing(df, strsplit("OCEAN","")[[1]])
-    
-    res.FA <- analysis.FA(X=res.Data$X, ID=res.Data$ID, nfactors=5, 
-                          filename=filename%++%"[2]")
-    
-    # (optional) Save the detailed console output from the FA to a text file.
-    # by using:
-    # tc <- textConnection("console", "w")
-    # sink(tc);  sink(tc, type = "message")
-    # res.FA <- analysis.FA( ... )
-    # sink(type = "message")
-    # sink();  close(tc)
-    # writeLines(console, filename%++%"[2]res.FA-console.txt")
+    # Don't run
+    if(FALSE){
+      
+      library(haven) # for SPSS .sav file
+      
+      # library(conflicted)
+      # conflicted::conflict_prefer("select", "dplyr")
+      # conflicted::conflict_prefer("filter", "dplyr")
+      
+      
+      # This section shows how the original SPSS data was read and saved as an RDS file (run once).
+      PersonalityTypes_241231 <- haven::read_sav("./datasets/241231 BIG5_DVs_FINAL3.sav") %>% as_tibble()
+      saveRDS(PersonalityTypes_241231, file = "./dataset/PersonalityTypes_241231.rds")
+      # PersonalityTypes_241231 <- readRDS("./dataset/PersonalityTypes_241231.rds")
+      
+      # Load the raw dataset from the RDS file.
+      df <- readRDS("./datasets/PersonalityTypes_241231.rds", refhook = NULL)
+      
+      
+      {
+        var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR_abil", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBHb", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
+        
+        df_new <- df %>% 
+          mutate("COMPAR_opin_after_PERSONALITY"=COMPAR_after_PERSONALITY,
+                 "COMPAR_abil_after_PERSONALITY"=COMPAR_after_PERSONALITY,
+                 "COMPAR_ach_after_PERSONALITY"=COMPAR_after_PERSONALITY,
+                 "COMPAR_gen_after_PERSONALITY"=COMPAR_after_PERSONALITY,
+                 "PA_after_PERSONALITY"=PANA_after_PERSONALITY,
+                 "NA_after_PERSONALITY"=PANA_after_PERSONALITY,
+                 "EBH_immut_after_PERSONALITY"=EBH_after_PERSONALITY,
+                 "EBH_eff_after_PERSONALITY"=EBH_after_PERSONALITY,
+                 "EBH_bio_after_PERSONALITY"=EBH_after_PERSONALITY,
+                 "EBHa_after_PERSONALITY"=EBH_after_PERSONALITY,
+                 "EBHb_after_PERSONALITY"=EBH_after_PERSONALITY,
+                 "MNG_after_PERSONALITY"=MNG_after_PERSONALITY,
+                 "MNG_pr_after_PERSONALITY"=MNG_after_PERSONALITY,
+                 "MNG_se_after_PERSONALITY"=MNG_after_PERSONALITY )
+        
+        for(hh in 1:length(var.list)){
+          set.seed(hh)
+          var <- var.list[hh]
+          var_filter <- var %++% "_after_PERSONALITY"
+          
+          df_new[var][ df_new[var_filter]!=1 | is.na(df_new[var_filter]) ] <- NA
+        }
+        
+        df.DV <- df_new %>% dplyr::select(ID=id, SE_after_PERSONALITY:MNG_se) %>% select(-ends_with("_after_PERSONALITY"))
+      }
+      
+      
+      
+      #-------------------------------------------------------------------
+      # 2. Exploratory Factor Analysis (EFA)
+      #-------------------------------------------------------------------
+      
+      # Set a seed for reproducibility of random processes in the analysis.
+      # Preprocess the raw data to extract relevant items and handle missing values.
+      # Perform Factor Analysis on the preprocessed data to reduce dimensionality and compute factor scores.
+      set.seed(1)
+      res.Data <- analysis.DataPreprocessing(df, strsplit("OCEAN","")[[1]])
+      
+      res.FA <- analysis.FA(X=res.Data$X, ID=res.Data$ID, nfactors=5, 
+                            filename=filename%++%"[2]")
+      
+      # Prepare the final cluster data by combining IDs, covariates (age, gender), and the stable cluster assignments.
+      ID <- res.FA$ID
+      age_min <- res.Data$df$age_min
+      gender_vote <- res.Data$df$gender_vote
+      Xnew <- res.FA$Xnew
+      
+      Xnew_cov <- data.frame(ID=ID, age=age_min, gender=gender_vote, Xnew) %>% 
+        left_join(df.DV, by="ID")
+      
+      
+      # Save the factor scores with covariates to a CSV/RData file.
+      write.csv(Xnew_cov, file=filename%++%"[2]Xnew_cov.csv", quote=TRUE, row.names=FALSE)
+      save(Xnew_cov, file=filename%++%"[2]Xnew_cov.RData")
+      
+    }
     
     
     #-------------------------------------------------------------------
@@ -144,8 +197,9 @@ run.PersonalityTypes <- function(){
     
     # Use the factor scores from EFA as the input dataset for clustering.
     # Carry over the participant IDs.
-    Xnew <- res.FA$Xnew
-    ID <- res.FA$ID
+    Xnew_cov <- R.utils::loadToEnv(filename%++%"[2]Xnew_cov.RData")$Xnew_cov
+    Xnew <- Xnew_cov %>% select(E:A)
+    ID <- Xnew_cov$ID
     
     
     res.GMM.best <- analysis.GMM.best(Xnew=Xnew, ID=ID, 
@@ -169,28 +223,26 @@ run.PersonalityTypes <- function(){
                             NEC.mat=NEC.mat, top=20,
                             filename=filename%++%"[4]")
     
+    
+    
     # Prepare the final cluster data by combining IDs, covariates (age, gender), and the stable cluster assignments.
-    ID <- res.FA$ID
-    age_min <- res.Data$df$age_min
-    gender_vote <- res.Data$df$gender_vote
-    Xclust.NVI <- res.NVI$Xclust.NVI
-    Xclust.NVI_cov <- data.frame(ID=ID,
-                                 age_min=age_min,
-                                 gender_vote=gender_vote,
-                                 Xclust.NVI)
+    Xnew_cov.NVI <- data.frame(Xnew_cov, class) %>% select(ID, age, gender, E:A, class, SE:MNG_se)
+    
+    
     
     # Save the final cluster assignments with covariates to a CSV file.
-    write.csv(Xclust.NVI_cov, 
-              file=filename%++%"[4]Xclust.NVI_cov.csv", 
-              quote=TRUE, row.names=FALSE)
+    write.csv(Xnew_cov.NVI, file=filename%++%"[4]Xnew_cov.NVI.csv", quote=TRUE, row.names=FALSE)
+    save(Xnew_cov.NVI, file=filename%++%"[4]Xnew_cov.NVI.RData")
+    
     
     # Generate a boxplot visualizing the profiles of the most stable clusters.
     NVI.BoxPlot( res.NVI, filename=filename%++%"[4]" )
     
     
     # Save all result objects from the analysis so far into a single .RData file for easy loading later.
-    save(df, Xclust.NVI_cov, res.Data, res.FA, res.GMM.best, res.NVI, 
-         file=filename%++%"[4]res.NVI.RData")
+    save(Xnew_cov.NVI, res.FA, res.GMM.best, res.NVI,  file=filename%++%"[4]res.NVI.RData")
+    
+    
     
     #-------------------------------------------------------------------
     # 5. Enrichment Analysis (for the best model)
@@ -207,8 +259,7 @@ run.PersonalityTypes <- function(){
                                               filename=filename)
     
     # Save the enrichment analysis results along with all previous results.
-    save(df, res.Data, res.FA, res.GMM.best, res.NVI, res.Enrichment.NVI, 
-         file=filename%++%"[5]res.Enrichment.NVI.RData")
+    save(Xnew_cov.NVI, res.FA, res.GMM.best, res.NVI, res.Enrichment.NVI, file=filename%++%"[5]res.Enrichment.NVI.RData")
     
     
     
@@ -234,6 +285,7 @@ run.PersonalityTypes <- function(){
     #      file=filename%++%"[5]res.Enrichment.range.NVI.RData")
     
     
+    
     #-------------------------------------------------------------------
     # 7. Compositional Regression (CompReg)
     #-------------------------------------------------------------------
@@ -243,80 +295,58 @@ run.PersonalityTypes <- function(){
     
     
     # Extract necessary objects from the loaded data.
-    df <- rdata$df
-    res.Data <- rdata$res.Data
-    res.FA <- rdata$res.FA
+    Xclust <- rdata$Xnew_cov.NVI
     res.GMM.best <- rdata$res.GMM.best
     res.NVI <- rdata$res.NVI
     nclust <- res.NVI$wh.best.NVI[1]
     seed <- res.NVI$wh.best.NVI[2]
-    Xnew <- rdata$res.FA$Xnew
-    Xclust <- rdata$Xclust.NVI_cov
     fit.best <- res.NVI$fit.best.NVI
-    
+
     
     # Extract posterior probabilities of cluster membership for each individual.
     # These probabilities are compositional data because they sum to 1 for each person.
     prob <- fit.best$z
     
     # Create the main regression dataset by combining cluster probabilities with various dependent variables (DVs).
-    Xreg <- cbind.data.frame(Xclust, prob=prob, 
-                             df %>% dplyr::select(SE_after_PERSONALITY:MNG_se)
-    ) %>% mutate("COMPAR_opin_after_PERSONALITY"=COMPAR_after_PERSONALITY,
-                 "COMPAR_abil_after_PERSONALITY"=COMPAR_after_PERSONALITY,
-                 "COMPAR_ach_after_PERSONALITY"=COMPAR_after_PERSONALITY,
-                 "COMPAR_gen_after_PERSONALITY"=COMPAR_after_PERSONALITY,
-                 "PA_after_PERSONALITY"=PANA_after_PERSONALITY,
-                 "NA_after_PERSONALITY"=PANA_after_PERSONALITY,
-                 "EBH_immut_after_PERSONALITY"=EBH_after_PERSONALITY,
-                 "EBH_eff_after_PERSONALITY"=EBH_after_PERSONALITY,
-                 "EBH_bio_after_PERSONALITY"=EBH_after_PERSONALITY,
-                 "EBHa_after_PERSONALITY"=EBH_after_PERSONALITY,
-                 "EBHb_after_PERSONALITY"=EBH_after_PERSONALITY,
-                 "MNG_after_PERSONALITY"=MNG_after_PERSONALITY,
-                 "MNG_pr_after_PERSONALITY"=MNG_after_PERSONALITY,
-                 "MNG_se_after_PERSONALITY"=MNG_after_PERSONALITY
-    )
+    Xreg <- cbind.data.frame( Xclust, prob=prob)
     
     
     # Define a list of outcome (dependent) variables to be analyzed.
-    var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR_abil", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBHb", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
+    var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR_abil", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA.", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBHb", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
+    
     
     
     #-- Unadjusted Analysis (without covariates) ----
     
     # Initialize a list to store results.
-    result.CompReg.filter <- NULL
+    result.CompReg <- NULL
     for(hh in 1:length(var.list)){
       set.seed(hh)
       var <- var.list[hh]
-      var_filter <- var %++% "_after_PERSONALITY"
       
-      # Filter the data based on a specific condition for each DV.
-      Xreg.filter <- Xreg %>% 
-        dplyr::select(age_min, gender_vote, starts_with("prob."), c(var, var_filter)) %>% 
-        filter(get(var_filter)==1)
+      Xreg2 <- Xreg %>% dplyr::select(starts_with("prob."), c(var)) %>% drop_na()
       
       # Prepare the compositional predictors (X0) and the outcome variable (Y).
-      X0 <- Xreg.filter %>% dplyr::select(starts_with("prob")) %>% as.data.frame %>% compositions::acomp() %>% as.data.frame %>% as.matrix
+      X0 <- Xreg2 %>% dplyr::select(starts_with("prob")) %>% as.data.frame %>% compositions::acomp() %>% as.data.frame %>% as.matrix
       X.clr <- compositions::clr(X0)
       X.log <- log(X0)
-      Y <- Xreg.filter %>% dplyr::select(var) %>% as.data.frame %>% as.matrix
+      Y <- Xreg2 %>% dplyr::select(var) %>% as.data.frame %>% as.matrix
       
       # Run the compositional regression using bootstrap for inference.
       set.seed(hh)
       res.CompReg <- png.CompReg(X0=X0, Y=Y, type="bootstrap")
       
       # Store the result for the current DV.
-      result.CompReg.filter[[hh]] <- res.CompReg
+      result.CompReg[[hh]] <- res.CompReg
     }
     
     # Loop through the results to create and save a forest plot for each DV.
     for( k in 1:length(var.list) ){
       set.seed(hh)
-      df.forest <- CompReg.forest(result.CompReg.filter[[k]][[1]], DV.name=var.list[k], class=1:nclust, width=30)
+      df.forest <- CompReg.forest(result.CompReg[[k]][[1]], DV.name=var.list[k], class=1:nclust, width=30)
       
-      grDevices::cairo_pdf(filename%++%"[6]ForestPlot-filtered-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
+      # grDevices::cairo_pdf(filename%++%"[6]ForestPlot-filtered-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
+      pdf(filename%++%"[6]ForestPlot-filtered-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
       plot( df.forest )
       dev.off()
     }
@@ -326,25 +356,20 @@ run.PersonalityTypes <- function(){
     #-- Adjusted Analysis (with covariates) ----
     # This section repeats the regression analysis, but adjusts for covariates.
     
-    result.CompReg.filter <- NULL
+    result.CompReg.adj <- NULL
     for(hh in 1:length(var.list)){
       set.seed(hh)
       var <- var.list[hh]
-      var_filter <- var %++% "_after_PERSONALITY"
       
-      
-      # Filter data and remove any rows with missing values in covariates.
-      Xreg.filter <- Xreg %>% 
-        dplyr::select(age_min, gender_vote, starts_with("prob."), c(var, var_filter)) %>% drop_na() %>% 
-        filter(get(var_filter)==1)
+      Xreg2 <- Xreg %>% dplyr::select(age, gender, starts_with("prob."), c(var)) %>% drop_na()
       
       # Prepare predictors (X0) and original outcome (Y).
-      X0 <- Xreg.filter %>% dplyr::select(starts_with("prob")) %>% as.data.frame %>% compositions::acomp() %>% as.data.frame %>% as.matrix
+      X0 <- Xreg2 %>% dplyr::select(starts_with("prob")) %>% as.data.frame %>% compositions::acomp() %>% as.data.frame %>% as.matrix
       X.clr <- compositions::clr(X0)
       X.log <- log(X0)
-      Y <- Xreg.filter %>% dplyr::select(var) %>% as.data.frame %>% as.matrix
+      Y <- Xreg2 %>% dplyr::select(var) %>% as.data.frame %>% as.matrix
       # Define covariates (Z).
-      Z <- Xreg.filter %>% dplyr::select(age_min, gender_vote) %>% as.data.frame %>% as.matrix
+      Z <- Xreg2 %>% dplyr::select(age, gender) %>% as.data.frame %>% as.matrix
       
       # Create an adjusted outcome (Ynew) by taking the residuals of Y regressed on Z.
       # This removes the linear effect of the covariates from the outcome variable.
@@ -356,16 +381,17 @@ run.PersonalityTypes <- function(){
       set.seed(hh)
       res.CompReg <- png.CompReg(X0=X0, Y=Ynew, type="bootstrap")
       
-      result.CompReg.filter[[hh]] <- res.CompReg
+      result.CompReg.adj[[hh]] <- res.CompReg
     }
     
     
     # Loop through the adjusted results to create and save a forest plot for each DV.
     for( k in 1:length(var.list) ){
       set.seed(hh)
-      df.forest <- CompReg.forest(result.CompReg.filter[[k]][[1]], DV.name=var.list[k], class=1:nclust, width=30)
+      df.forest <- CompReg.forest(result.CompReg.adj[[k]][[1]], DV.name=var.list[k], class=1:nclust, width=30)
       
-      grDevices::cairo_pdf(filename%++%"[6]ForestPlot-filtered-Adjusted-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
+      # grDevices::cairo_pdf(filename%++%"[6]ForestPlot-filtered-Adjusted-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
+      pdf(filename%++%"[6]ForestPlot-filtered-Adjusted-"%++%var.list[k]%++%".pdf", width = 6.2, height = 2)
         plot( df.forest )
       dev.off()
     }
@@ -384,9 +410,9 @@ run.PersonalityTypes <- function(){
       set.seed(hh)
       # Filter the data for the current age group.
       Xclust.age <- Xclust %>% 
-        mutate(agecut = cut( age_min, breaks = 0:8*10, right=FALSE )) %>% 
+        mutate(agecut = cut( age, breaks = 0:8*10, right=FALSE )) %>% 
         filter(agecut==age.list[hh]) %>% 
-        dplyr::select(-ID, -gender_vote, -age_min, -agecut)
+        dplyr::select(-ID, -gender, -age, -agecut)
       
       # Create a boxplot of personality profiles for that specific age group.
       Xclust.boxplot.filename(Xclust=Xclust.age, wh.best=c(nclust,seed), 
@@ -400,8 +426,8 @@ run.PersonalityTypes <- function(){
       set.seed(hh)
       # Filter the data for the current gender.
       Xclust.gender <- Xclust %>% 
-        filter(gender_vote==gender.list[hh]) %>% 
-        dplyr::select(-ID, -gender_vote, -age_min)
+        filter(gender==gender.list[hh]) %>% 
+        dplyr::select(-ID, -gender, -age)
       
       # Create a boxplot of personality profiles for that specific gender.
       Xclust.boxplot.filename(Xclust=Xclust.gender, wh.best=c(nclust,seed), 
@@ -412,18 +438,18 @@ run.PersonalityTypes <- function(){
     #-- Create Line Plots for Comparison ----
     # Prepare data for plotting by converting it to a long format.
     Xclust.age.total <- Xclust %>% 
-      mutate(agecut = cut( age_min, breaks = 0:8*10, right=FALSE ))
+      mutate(agecut = cut( age, breaks = 0:8*10, right=FALSE ))
     
     Xclust.age.total.df <- Xclust.age.total %>% 
-      dplyr::select(-ID, -age_min) %>% 
-      gather(Factors, value, -class, -agecut, -gender_vote) %>% 
+      dplyr::select(-ID, -age) %>% 
+      gather(Factors, value, -class, -agecut, -gender) %>% 
       mutate(class=as.factor(class),
              Factors=factor(Factors, levels=c("O","C","E","A","N"))
       )
     
     # Create a line plot comparing mean factor scores across clusters for different age groups.
     Xclust.age.total.df %>% 
-      dplyr::select(-gender_vote) %>% 
+      dplyr::select(-gender) %>% 
       filter(!is.na(agecut), agecut %in% age.list) %>% 
       # group_by(agecut, class, Factors) %>% 
       # summarise(value=mean(value)) %>% 
@@ -440,12 +466,12 @@ run.PersonalityTypes <- function(){
     
     # Create a line plot comparing mean factor scores across clusters for different genders.
     Xclust.age.total.df %>%
-      filter(!is.na(gender_vote), gender_vote %in% c("male", "female")) %>% 
-      # select(-gender_vote) %>% 
+      filter(!is.na(gender), gender %in% c("male", "female")) %>% 
+      # select(-gender) %>% 
       # filter(!is.na(agecut), agecut %in% age.list) %>% 
-      # group_by(gender_vote, class, Factors) %>% 
+      # group_by(gender, class, Factors) %>% 
       # summarise(value=mean(value)) %>% 
-      ggpubr::ggline(x="Factors", y="value", color="gender_vote", palette=ggsci::pal_frontiers()(2), 
+      ggpubr::ggline(x="Factors", y="value", color="gender", palette=ggsci::pal_frontiers()(2), 
                      add = c("mean_se"),
                      # size=0.3,
                      # plot_type="l",
@@ -454,29 +480,6 @@ run.PersonalityTypes <- function(){
                      facet.by="class", nrow=1, ggtheme=theme_pubr()) + guides(color = guide_legend(title="Gender", nrow = 1))
     
     ggsave(filename=paste0(filename,"[7]Gender-LinePlot-Gender=Total","-seed=",seed,",nclust=",nclust,".pdf"), height=3, width=10)
-    
-    
-    
-    
-    
-    
-    # Effect size estimation for each pair of cluster-dimension ----
-    # if(FALSE){
-    #   library(dplyr)
-    #   Xclust_average <- Xclust %>% filter(class==4) %>% select(E:A)
-    #   Xclust$class
-    #   
-    #   library(effectsize)
-    #   
-    #   t.test(Xclust_average[,1])
-    #   
-    #   mean(Xclust_average[,1]) / ( sd(Xclust_average[,1]) )
-    #   d_result_O <- apply(Xclust_average, 2, function(x) cohens_d(x, mu = 0))
-    #   d_result_O
-    #   
-    #   colMeans(Xclust_average)
-    #   c(-0.14, 0.21, 0.25, 0.4, -0.18)
-    # }
     
     
     

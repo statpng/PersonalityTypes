@@ -1,3 +1,12 @@
+# Due to a nondisclosure agreement and joint data ownership between the Center for [blinded] and Kakao Corporation, 
+# we are unable to publicly share the raw scores of individual scale items. 
+# Instead, the dataset includes factor scores derived from our factor analysis of the IPIP-NEO-120 responses, 
+# along with the composite score(s) for each correlate. Although the raw data necessary for conducting a factor analysis are not included, 
+# we have provided the analysis code for transparency. The dataset can be analyzed beginning with the code provided for the GMM analysis.
+  
+
+
+
 #' @title Calculate Normalized Entropy Criterion (NEC)
 #' @description Calculates the Normalized Entropy Criterion for a given clustering model.
 #'
@@ -68,7 +77,7 @@ tsallis_entropy <- function(p, q) {
 #' @importFrom stats runif
 #'
 #' @details
-#' This function systematically explores the solution space of Gaussian Mixture Models to find the optimal number of clusters. It iterates through a specified number of clusters (`1:max.clust`).
+#' This function systematically explores the solution space of Gaussian Mixture Models to find the optimal number of clusters. It iterates through a specified number of clusters (`1:max.clust`) and a set of random initializations (`seed.set`).
 #'
 #' For each combination of cluster number and seed, it fits a GMM (`mclust::Mclust` with `modelNames="VVV"`) and calculates the NEC using `calculate_nec`. The `q` value for Tsallis entropy within NEC is hardcoded to 1.5 in this implementation.
 #'
@@ -83,6 +92,7 @@ tsallis_entropy <- function(p, q) {
 #' @param ID An optional identifier for the analysis run.
 #' @param max.clust The maximum number of clusters to test. Default is 10.
 #' @param filename A base string for output PDF file names. If `NULL`, plots are not saved.
+#' @param subsample.size The number of random seeds to try. Default is 100.
 #' @param type The criterion for model selection (currently hardcoded to "NEC").
 #' @return A list containing:
 #' \item{ID}{The analysis identifier.}
@@ -94,7 +104,7 @@ tsallis_entropy <- function(p, q) {
 #'
 #' @export analysis.GMM.best
 analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10, 
-                              filename=NULL, print.pdf=TRUE, 
+                              filename=NULL, subsample.size=100, print.pdf=TRUE, 
                               q=1.0, type="NEC"){
   
   library(mclust) # for GMM
@@ -104,7 +114,7 @@ analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10,
   
   count <- 0
   base_loglik <- Mclust(Xnew, G=1, modelNames="VVV")$loglik
-  for(j in 1:200){
+  for(j in seed.set){
     count <- count + 1
     print(count)
     fit.mclust <- NULL
