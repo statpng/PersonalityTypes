@@ -1,6 +1,6 @@
 # PersonalityTypes
 
-- This begins with preprocessing raw survey data and performing Exploratory Factor Analysis (EFA) to derive latent factor scores. 
+- This package begins with preprocessing raw survey data and performing Exploratory Factor Analysis (EFA) to derive latent factor scores. 
 - It then applies Gaussian Mixture Models (GMM) to these scores, using the Normalized Entropy Criterion (NEC) and Normalized Variation of Information (NVI) to identify the optimal and most stable cluster solution, representing distinct 
 personality types.
 - It also includes methods for validating cluster robustness via permutation-based enrichment testing.
