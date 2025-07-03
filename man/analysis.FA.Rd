@@ -4,12 +4,10 @@
 \alias{analysis.FA}
 \title{Perform First and Second-Order Factor Analysis}
 \usage{
-analysis.FA(X, ID, nfactors = NULL, nfactors2 = NULL, filename = NULL)
+analysis.FA(X, nfactors = NULL, nfactors2 = NULL, filename = NULL)
 }
 \arguments{
 \item{X}{A numeric matrix or data frame of the observed variables (e.g., item responses).}
-
-\item{ID}{A vector of identifiers for each row in \code{X}.}
 
 \item{nfactors}{An optional integer specifying the number of first-order factors. If \code{NULL} (the default), it is determined automatically via parallel analysis.}
 
@@ -19,7 +17,6 @@ analysis.FA(X, ID, nfactors = NULL, nfactors2 = NULL, filename = NULL)
 }
 \value{
 A list containing:
-\item{ID}{The input identifier vector.}
 \item{X}{The original input data matrix.}
 \item{Xnew}{A matrix of the final factor scores. This will be the first-order factor scores if \code{nfactors2} is NULL, or the second-order factor scores otherwise.}
 \item{console}{A placeholder for console output (currently not used).}

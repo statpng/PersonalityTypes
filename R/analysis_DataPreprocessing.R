@@ -23,7 +23,6 @@
 #' @param FactorNames A character vector of single-letter prefixes used to identify the personality factor items. Defaults to `c("O", "C", "E", "A", "N")` for the Big Five model.
 #'
 #' @return A list containing three elements:
-#' \item{ID}{A vector of participant IDs corresponding to the cleaned data.}
 #' \item{X}{A numeric data frame or matrix containing only the cleaned personality item data, suitable for modeling.}
 #' \item{df}{The preprocessed version of the input data frame, including the harmonized `age_min` and `gender_vote` columns and filtered to match the rows in `X`.}
 #'
@@ -96,8 +95,7 @@ analysis.DataPreprocessing <- function(df, FactorNames=strsplit("OCEAN","")[[1]]
   
   df <- df %>%
     filter(if_all(matches("^(O|C|E|A|N)\\d+$"), ~ !is.na(.))) %>%
-    mutate(age_min = pmin(age_O, age_C, age_E, age_A, age_N, na.rm = TRUE),
-           ID=id)
+    mutate(age_min = pmin(age_O, age_C, age_E, age_A, age_N, na.rm = TRUE))
   
   df$gender_vote <- df %>% select(contains("gender")) %>% {
     apply(., 1, function(x) x[order(table(unlist(x)),decreasing=TRUE)[1]] )
@@ -118,12 +116,10 @@ analysis.DataPreprocessing <- function(df, FactorNames=strsplit("OCEAN","")[[1]]
   "(List of Factors)" %>% print
   gsub("[0-9]", "", colnames(X)) %>% table %>% print 
   
-  ID <- df$ID
   
   
   result <- NULL
   
-  result$ID <- ID
   result$X <- X
   result$df <- df
   

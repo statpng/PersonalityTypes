@@ -13,7 +13,6 @@ analysis.DataPreprocessing(df, FactorNames = strsplit("OCEAN", "")[[1]])
 }
 \value{
 A list containing three elements:
-\item{ID}{A vector of participant IDs corresponding to the cleaned data.}
 \item{X}{A numeric data frame or matrix containing only the cleaned personality item data, suitable for modeling.}
 \item{df}{The preprocessed version of the input data frame, including the harmonized \code{age_min} and \code{gender_vote} columns and filtered to match the rows in \code{X}.}
 }

@@ -1,7 +1,7 @@
 # Due to a nondisclosure agreement and joint data ownership between the Center for [blinded] and Kakao Corporation, 
 # we are unable to publicly share the raw scores of individual scale items. 
 # Instead, the dataset includes factor scores derived from our factor analysis of the IPIP-NEO-120 responses, 
-# along with the composite score(s) for each correlate. Although the raw data necessary for conducting a factor analysis are not included, 
+# along with the composite score(s) for each correlate. Although the raw data necessary for conducting the factor analysis are not included, 
 # we have provided the analysis code for transparency. The dataset can be analyzed beginning with the code provided for the GMM analysis.
 
 #' @title Perform First and Second-Order Factor Analysis
@@ -36,13 +36,11 @@
 #' The function saves diagnostic plots (scree plot, factor diagrams) as PDF files and returns the final factor scores, which can be used as input for subsequent analyses like clustering or regression.
 #'
 #' @param X A numeric matrix or data frame of the observed variables (e.g., item responses).
-#' @param ID A vector of identifiers for each row in `X`.
 #' @param nfactors An optional integer specifying the number of first-order factors. If `NULL` (the default), it is determined automatically via parallel analysis.
 #' @param nfactors2 An optional integer specifying the number of second-order factors. If `NULL` (the default), the second-order analysis is skipped.
 #' @param filename A base string for the output PDF file names (e.g., scree plots, diagrams).
 #'
 #' @return A list containing:
-#' \item{ID}{The input identifier vector.}
 #' \item{X}{The original input data matrix.}
 #' \item{Xnew}{A matrix of the final factor scores. This will be the first-order factor scores if `nfactors2` is NULL, or the second-order factor scores otherwise.}
 #' \item{console}{A placeholder for console output (currently not used).}
@@ -50,9 +48,9 @@
 #' @seealso \code{\link[psych]{fa}}, \code{\link[psych]{fa.parallel}}, \code{\link[psych]{fa.multi}}, \code{\link[psych]{KMO}}
 #'
 #' @export analysis.FA
-analysis.FA <- function(X, ID, nfactors=NULL, nfactors2=NULL, filename=NULL){
+analysis.FA <- function(X, nfactors=NULL, nfactors2=NULL, filename=NULL){
   if(FALSE){
-    X=res.Data$X; ID=res.Data$ID; nfactors=5
+    X=res.Data$X; nfactors=5
   }
   
   library(psych) # for FA
@@ -180,11 +178,10 @@ analysis.FA <- function(X, ID, nfactors=NULL, nfactors2=NULL, filename=NULL){
   # close(tc)
   
   
-  # save(ID, X, Xnew, file=paste0(filename,"-1.FactorAnalysis.RData"))
+  # save(X, Xnew, file=paste0(filename,"-1.FactorAnalysis.RData"))
   
   
   result <- NULL
-  result$ID <- ID
   result$X <- X
   result$Xnew <- Xnew
   result$console <- console

@@ -1,7 +1,7 @@
 # Due to a nondisclosure agreement and joint data ownership between the Center for [blinded] and Kakao Corporation, 
 # we are unable to publicly share the raw scores of individual scale items. 
 # Instead, the dataset includes factor scores derived from our factor analysis of the IPIP-NEO-120 responses, 
-# along with the composite score(s) for each correlate. Although the raw data necessary for conducting a factor analysis are not included, 
+# along with the composite score(s) for each correlate. Although the raw data necessary for conducting the factor analysis are not included, 
 # we have provided the analysis code for transparency. The dataset can be analyzed beginning with the code provided for the GMM analysis.
   
 
@@ -89,13 +89,11 @@ tsallis_entropy <- function(p, q) {
 #' The function returns a comprehensive list of results, including the matrix of all NEC values and the best model found.
 #'
 #' @param Xnew A numeric matrix or data frame of observations.
-#' @param ID An optional identifier for the analysis run.
 #' @param max.clust The maximum number of clusters to test. Default is 10.
 #' @param filename A base string for output PDF file names. If `NULL`, plots are not saved.
 #' @param subsample.size The number of random seeds to try. Default is 100.
 #' @param type The criterion for model selection (currently hardcoded to "NEC").
 #' @return A list containing:
-#' \item{ID}{The analysis identifier.}
 #' \item{Xnew}{The input data.}
 #' \item{NEC.mat}{A matrix of NEC values (rows are seeds, columns are cluster numbers).}
 #' \item{fit.best}{The `Mclust` object for the best model found (one of the top 3).}
@@ -103,7 +101,7 @@ tsallis_entropy <- function(p, q) {
 #' \item{Xclust}{The input data with an appended `class` column from the best model.}
 #'
 #' @export analysis.GMM.best
-analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10, 
+analysis.GMM.best <- function(Xnew=NULL, max.clust=10, 
                               filename=NULL, subsample.size=100, print.pdf=TRUE, 
                               q=1.0, type="NEC"){
   
@@ -165,7 +163,6 @@ analysis.GMM.best <- function(Xnew=NULL, ID=NULL, max.clust=10,
   }
   
   result <- NULL
-  result$ID <- ID
   result$Xnew <- Xnew
   result$NEC.mat <- NEC.mat
   result$fit.best <- fit.best.ii

@@ -6,7 +6,6 @@
 \usage{
 analysis.GMM.best(
   Xnew = NULL,
-  ID = NULL,
   max.clust = 10,
   filename = NULL,
   subsample.size = 100,
@@ -18,8 +17,6 @@ analysis.GMM.best(
 \arguments{
 \item{Xnew}{A numeric matrix or data frame of observations.}
 
-\item{ID}{An optional identifier for the analysis run.}
-
 \item{max.clust}{The maximum number of clusters to test. Default is 10.}
 
 \item{filename}{A base string for output PDF file names. If \code{NULL}, plots are not saved.}
@@ -30,7 +27,6 @@ analysis.GMM.best(
 }
 \value{
 A list containing:
-\item{ID}{The analysis identifier.}
 \item{Xnew}{The input data.}
 \item{NEC.mat}{A matrix of NEC values (rows are seeds, columns are cluster numbers).}
 \item{fit.best}{The \code{Mclust} object for the best model found (one of the top 3).}

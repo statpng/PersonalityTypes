@@ -130,7 +130,7 @@ run.PersonalityTypes <- function(){
       
       
       {
-        var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR_abil", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBHb", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
+        var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR.", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBH", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
         
         df_new <- df %>% 
           mutate("COMPAR_opin_after_PERSONALITY"=COMPAR_after_PERSONALITY,
@@ -156,7 +156,7 @@ run.PersonalityTypes <- function(){
           df_new[var][ df_new[var_filter]!=1 | is.na(df_new[var_filter]) ] <- NA
         }
         
-        df.DV <- df_new %>% dplyr::select(ID=id, SE_after_PERSONALITY:MNG_se) %>% select(-ends_with("_after_PERSONALITY"))
+        df.DV <- df_new %>% dplyr::select(SE_after_PERSONALITY:MNG_se) %>% select(-ends_with("_after_PERSONALITY"))
       }
       
       
@@ -171,22 +171,21 @@ run.PersonalityTypes <- function(){
       set.seed(1)
       res.Data <- analysis.DataPreprocessing(df, strsplit("OCEAN","")[[1]])
       
-      res.FA <- analysis.FA(X=res.Data$X, ID=res.Data$ID, nfactors=5, 
+      res.FA <- analysis.FA(X=res.Data$X, nfactors=5, 
                             filename=filename%++%"[2]")
       
       # Prepare the final cluster data by combining IDs, covariates (age, gender), and the stable cluster assignments.
-      ID <- res.FA$ID
       age_min <- res.Data$df$age_min
       gender_vote <- res.Data$df$gender_vote
       Xnew <- res.FA$Xnew
       
-      Xnew_cov <- data.frame(ID=ID, age=age_min, gender=gender_vote, Xnew) %>% 
-        left_join(df.DV, by="ID")
+      data <- data.frame(age=age_min, gender=gender_vote, Xnew, df.DV)
       
       
       # Save the factor scores with covariates to a CSV/RData file.
-      write.csv(Xnew_cov, file=filename%++%"[2]Xnew_cov.csv", quote=TRUE, row.names=FALSE)
-      save(Xnew_cov, file=filename%++%"[2]Xnew_cov.RData")
+      write.csv(data, file="./data.csv", quote=TRUE, row.names=FALSE)
+      save(data, file="./data.RData")
+      
       
     }
     
@@ -197,12 +196,11 @@ run.PersonalityTypes <- function(){
     
     # Use the factor scores from EFA as the input dataset for clustering.
     # Carry over the participant IDs.
-    Xnew_cov <- R.utils::loadToEnv(filename%++%"[2]Xnew_cov.RData")$Xnew_cov
-    Xnew <- Xnew_cov %>% select(E:A)
-    ID <- Xnew_cov$ID
+    data <- R.utils::loadToEnv("data.RData")$data
+    Xnew <- data %>% select(E:A)
     
     
-    res.GMM.best <- analysis.GMM.best(Xnew=Xnew, ID=ID, 
+    res.GMM.best <- analysis.GMM.best(Xnew=Xnew, 
                                       max.clust=10, subsample.size=100,
                                       q=1.0, filename=filename%++%"[3]")
     # save(res.GMM.best, file="res.GMM.best_q=1.0.RData")
@@ -226,13 +224,12 @@ run.PersonalityTypes <- function(){
     
     
     # Prepare the final cluster data by combining IDs, covariates (age, gender), and the stable cluster assignments.
-    Xnew_cov.NVI <- data.frame(Xnew_cov, class) %>% select(ID, age, gender, E:A, class, SE:MNG_se)
-    
+    data_withclassno <- data.frame(data, class) %>% select(age, gender, E:A, class, SE:MNG_se)
     
     
     # Save the final cluster assignments with covariates to a CSV file.
-    write.csv(Xnew_cov.NVI, file=filename%++%"[4]Xnew_cov.NVI.csv", quote=TRUE, row.names=FALSE)
-    save(Xnew_cov.NVI, file=filename%++%"[4]Xnew_cov.NVI.RData")
+    write.csv(data_withclassno, file="./data_withclassno.csv", quote=TRUE, row.names=FALSE)
+    save(data_withclassno, file="./data_withclassno.RData")
     
     
     # Generate a boxplot visualizing the profiles of the most stable clusters.
@@ -240,7 +237,7 @@ run.PersonalityTypes <- function(){
     
     
     # Save all result objects from the analysis so far into a single .RData file for easy loading later.
-    save(Xnew_cov.NVI, res.FA, res.GMM.best, res.NVI,  file=filename%++%"[4]res.NVI.RData")
+    save(data_withclassno, res.FA, res.GMM.best, res.NVI,  file=filename%++%"[4]res.NVI.RData")
     
     
     
@@ -259,7 +256,7 @@ run.PersonalityTypes <- function(){
                                               filename=filename)
     
     # Save the enrichment analysis results along with all previous results.
-    save(Xnew_cov.NVI, res.FA, res.GMM.best, res.NVI, res.Enrichment.NVI, file=filename%++%"[5]res.Enrichment.NVI.RData")
+    save(data_withclassno, res.FA, res.GMM.best, res.NVI, res.Enrichment.NVI, file=filename%++%"[5]res.Enrichment.NVI.RData")
     
     
     
@@ -295,7 +292,7 @@ run.PersonalityTypes <- function(){
     
     
     # Extract necessary objects from the loaded data.
-    Xclust <- rdata$Xnew_cov.NVI
+    Xclust <- rdata$data_withclassno
     res.GMM.best <- rdata$res.GMM.best
     res.NVI <- rdata$res.NVI
     nclust <- res.NVI$wh.best.NVI[1]
@@ -312,7 +309,7 @@ run.PersonalityTypes <- function(){
     
     
     # Define a list of outcome (dependent) variables to be analyzed.
-    var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR_abil", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA.", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBHb", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
+    var.list <- c("SE", "GRAT", "SWLS", "COMPAR", "COMPAR_opin", "COMPAR.", "COMPAR_ach", "COMPAR_gen", "OPT", "PA", "NA.", "STRESS", "EBH_immut", "EBH_eff", "EBH_bio", "EBHa", "EBH", "SES", "LONE", "MNG", "MNG_pr", "MNG_se")
     
     
     
@@ -412,7 +409,7 @@ run.PersonalityTypes <- function(){
       Xclust.age <- Xclust %>% 
         mutate(agecut = cut( age, breaks = 0:8*10, right=FALSE )) %>% 
         filter(agecut==age.list[hh]) %>% 
-        dplyr::select(-ID, -gender, -age, -agecut)
+        dplyr::select(-gender, -age, -agecut)
       
       # Create a boxplot of personality profiles for that specific age group.
       Xclust.boxplot.filename(Xclust=Xclust.age, wh.best=c(nclust,seed), 
@@ -427,7 +424,7 @@ run.PersonalityTypes <- function(){
       # Filter the data for the current gender.
       Xclust.gender <- Xclust %>% 
         filter(gender==gender.list[hh]) %>% 
-        dplyr::select(-ID, -gender, -age)
+        dplyr::select(-gender, -age)
       
       # Create a boxplot of personality profiles for that specific gender.
       Xclust.boxplot.filename(Xclust=Xclust.gender, wh.best=c(nclust,seed), 
@@ -441,7 +438,7 @@ run.PersonalityTypes <- function(){
       mutate(agecut = cut( age, breaks = 0:8*10, right=FALSE ))
     
     Xclust.age.total.df <- Xclust.age.total %>% 
-      dplyr::select(-ID, -age) %>% 
+      dplyr::select(-age) %>% 
       gather(Factors, value, -class, -agecut, -gender) %>% 
       mutate(class=as.factor(class),
              Factors=factor(Factors, levels=c("O","C","E","A","N"))
